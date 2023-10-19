@@ -1,3 +1,5 @@
+% Se establece la BC con las reglas con los hechos
+
 % Hechos para proyectos
 % Se puede modificar
 proyecto('Proyecto1', 'Empresa1', 1000, '01-01-2023', '31-01-2023').
