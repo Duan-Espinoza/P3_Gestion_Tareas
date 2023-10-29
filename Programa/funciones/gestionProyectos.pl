@@ -36,7 +36,13 @@ alerta_messageProyectos3:-
     write('             │           ⚠ ALERTA ⚠               │'), nl,
     write('             │  Error: Proyecto ya existe         │'), nl,
     write('             ╰────────────────────────────────────╯').
-
+alerta_messageProyectos4:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  No se encuentran registros de     │'), nl,
+    write('             │  Proyectos                         │'), nl,
+    write('             ╰────────────────────────────────────╯').
 loadProyecto:-
     write('             ╭─────   Registrando proyecto   ─────╮'), nl,
     write('             │          Guardando datos...        │'), nl,
@@ -48,6 +54,14 @@ mssg_mostrarProyectos:-
     write('│           registrada con respecto a las proyectos.                              │'), nl,
     write('╰─────────────────────────────────────────────────────────────────────────────────╯'), nl.
     
+
+vista_indicacionProyectos:-
+    nl,nl,
+    write('╭─────────────────────────────────────────────────────────────────────╮'), nl,
+    write('│  MENSAJE: A continuación rellene la información que se le solicita  │'), nl,
+    write('│           para crear un Proyecto en la base de conocimiento.        │'), nl,
+    write('╰─────────────────────────────────────────────────────────────────────╯'), nl.
+
 %                   Controladores
 
 main_Proyectos:-
@@ -57,13 +71,13 @@ main_Proyectos:-
     atom_string(OpcionAtom, Opcion),
     (
         Opcion = "1", pideData;
-        Opcion = "2", write('develop');
+        Opcion = "2", mostrar_datos;
         Opcion = "0", write('develop')
     ).
 
 
 pideData:-
-    nl,
+    nl,vista_indicacionProyectos,
     write('►Ingrese el nombre del Proyecto: '),
     read_line(NombreCodes),
     atom_codes(NombreAtom, NombreCodes),
@@ -195,9 +209,14 @@ archivo_existe(NombreArchivo) :-
 
 
 mostrar_datos :-
-    open('../data/proyectos.txt', read, Stream),
-    mostrar_datos_desde_archivo(Stream),
-    close(Stream).
+    nl,nl,mssg_mostrarProyectos,
+    (
+        archivo_existe('../data/proyectos.txt') ->
+        open('../data/proyectos.txt', read, Stream),
+        mostrar_datos_desde_archivo(Stream),
+        close(Stream),main_Proyectos;
+        alerta_messageProyectos4,mostrar_datos
+    ).
 
 mostrar_datos_desde_archivo(Stream) :-
     read_line(Stream, Line),

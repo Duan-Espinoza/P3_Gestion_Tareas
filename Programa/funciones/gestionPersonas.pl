@@ -119,7 +119,7 @@ imprimir_Personas:-
         open('../data/personas.txt', read, Stream),
         leer_y_mostrar_lineas(Stream),
         close(Stream), controladorPrincipal_Personas;
-        alerta_4
+        alerta_4,controladorPrincipal_Personas
     ).
 
 leer_y_mostrar_lineas(Stream) :-
