@@ -1,4 +1,2 @@
-_14870
-malechong
-femalejasjdjahong
-female
+aaron,backend,20.0,10,proyecto 1
+hansol,frontend,20.0,10,proyecto 2
