@@ -7,7 +7,7 @@ main :-
     write('\n 1. Registrar un proyecto'),
     write('\n 2. Mostrar proyectos con costos'),
     write('\n 3. Salir'),
-    write('\nIngrese una opción: '),
+    write('\nIngrese una opcion: '),
     read(Opcion),
     ejecutar(Opcion).
 
