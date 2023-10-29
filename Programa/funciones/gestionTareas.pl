@@ -30,14 +30,38 @@ mainTareas :-
     ).
     
 
+
+% Verificar si la tarea ya existe en el archivo
+tareaNoExiste(Tarea) :-
+    not(tareaExisteEnArchivo(Tarea)).
+
+% Verificar si la tarea existe en el archivo
+tareaExisteEnArchivo(Tarea) :-
+    open('../data/tareas.txt', read, Stream),
+    tareaExisteEnArchivoAux(Tarea, Stream),
+    close(Stream).
+
+% Lógica auxiliar para verificar si la tarea existe en el archivo
+tareaExisteEnArchivoAux(_, EndOfFile) :-
+    at_end_of_stream(EndOfFile), !, fail.
+tareaExisteEnArchivoAux(Tarea, Stream) :-
+    read_line_to_string(Stream, Line),
+    (   Line = Tarea -> true ; tareaExisteEnArchivoAux(Tarea, Stream) ).
+
+
+
 % Función para agregar una nueva tarea en la base de conocimientos
 agregarTarea :-
     write('\nIngrese el nombre del proyecto: '),
     read_line(TareaCodes),
     atom_codes(TareaAtom, TareaCodes),
-    atom_string(TareaAtom, Tarea),
-    downcase_atom(Tarea, TareasMinuscula),
-    registrarTarea(TareasMinuscula).   
+    atom_string(Task, TareaAtom),
+    downcase_atom(Task, LowerCaseTask),
+    (   tareaNoExiste(LowerCaseTask) ->
+        registrarTarea(LowerCaseTask)
+    ;
+        write('Error: La tarea ya existe'), nl
+    ).  
  
 
 
