@@ -1,6 +1,3 @@
-%               Sección de Carga de Funciones
-:- consult('gestionPersonas.pl').
-
 %               Sección de Modulos
 :- use_module(library(dialect/sicstus), [read_line/1]). % Para leer una linea de texto y que se vea sin las :| 
 
@@ -41,7 +38,7 @@ help:-
     nl,nl,
     write('╭───────────────────────────────────────╮'), nl,
     write('│        SECCIÓN DE AYUDA PARA LA       │'), nl,
-    write('│                                       │'), nl, 
+    write('├───────────────────────────────────────┤'), nl,
     write('|                                       │'), nl,
     write('│                                       │'), nl,
     write('│ 1. Seleccione una opción ingresando   │'), nl,
@@ -59,6 +56,15 @@ help:-
     write('│                                       │'), nl,
     write('╰───────────────────────────────────────╯'), nl.
 
+
+alerta_option:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  Opcion No valida                  │'), nl,
+    write('             │  Nota: Seleccione una mostrada     │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
 % Vista de salida
 exit:-
     nl,nl,
@@ -68,7 +74,7 @@ exit:-
     write('╰───────────────────────────────────────╯'), nl.
 
 %               Sección de Controladores
-main:-
+mainPrincipal:-
     vista_main,
     read_line(OpcionCodes),
     atom_codes(OpcionAtom, OpcionCodes),
@@ -76,7 +82,7 @@ main:-
         atom_number(OpcionAtom, Opcion), Opcion == 1, menu_administrativo;
         atom_number(OpcionAtom, Opcion), Opcion == 2, help;
         atom_number(OpcionAtom, Opcion), Opcion == 3, exit
-        ; nl, write('Error: debe de ingresar una de las opciones mostradas'), nl, main
+        ; nl, write('Error: debe de ingresar una de las opciones mostradas'), nl,mainPrincipal
     ).
     
 menu_administrativo:-
@@ -84,14 +90,14 @@ menu_administrativo:-
     read_line(OpcionCodes),
     atom_codes(OpcionAtom, OpcionCodes),
     (
-        atom_number(OpcionAtom, Opcion), Opcion == 1, controladorPrincipal_Personas;
-        atom_number(OpcionAtom, Opcion), Opcion == 2, controladorPrincipal_Personas;
-        atom_number(OpcionAtom, Opcion), Opcion == 3, write('Develop');
+        atom_number(OpcionAtom, Opcion), Opcion == 1, consult('gestionPersonas.pl'),controladorPrincipal_Personas;
+        atom_number(OpcionAtom, Opcion), Opcion == 2, write('Develop');
+        atom_number(OpcionAtom, Opcion), Opcion == 3, consult('gestionTareas.pl'),mainTareas;
         atom_number(OpcionAtom, Opcion), Opcion == 4, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 5, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 6, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 7, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 8, write('Develop'); 
-        nl, write('Error: debe de ingresar una de las opciones mostradas'), nl, main_administrativo
+        alerta_option, nl, main_administrativo
     ).
 

@@ -1,0 +1,4 @@
+PROYECTO,Pendiente,sin asignar,sin fecha cierre
+PROYECTO 1,Pendiente,sin asignar,sin fecha de cierre
+proyecto 4,Pendiente,sin asignar,sin fecha de cierre
+

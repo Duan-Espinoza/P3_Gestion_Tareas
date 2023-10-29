@@ -5,21 +5,7 @@
 % Ejecución: swipl -s gestionPersonas.pl
 
 :- use_module(library(dialect/sicstus), [read_line/1]). % Para leer una linea de texto y que se vea sin las :| 
-
-
-
-
-% Funcion encargada de mostrar el menu principal
-% Inicializador 
-% Restricciones: Se debe de seleccionar alguna de las opciones disponibles
-main:- 
-    write('\nBienvenido a Gestión de Personas'), 
-    write('\n 1. Registrar una persona'), 
-    write('\n 2. Mostrar personas'),
-    write('\nIngrese una opción: '),
-    read(Opcion), 
-    ejecutar(Opcion).
-
+ 
 ejecutar(Opcion):-
     Opcion == 1, datosPersona;
     Opcion == 2, true; 
@@ -67,10 +53,10 @@ datosPersona:-
 
                     % Registra La Persona
                     write('╭────────────────────────────────────────────╮'), nl,
-                    format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo :  ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
-                    write('Guardando datos...'),
-                    registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula)
-                    ;nl,write('Las tareas no son validas'),nl,write(''),nl,datosPersona
+                    format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
+                    nl,load,
+                    registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula);
+                    alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
                 )
                 ;alerta_2,datosPersona
             )
@@ -85,7 +71,7 @@ datosPersona:-
 % Salidas: Archivo con los datos de la persona
 % Restricciones: El archivo debe de existir
 registraPersona(Nombre,Puesto,Costo,Reating,Tareas) :-   %Ejemplo: registraPersona('personas.txt', 'Juan', 'Gerente', 5000, 4.5).
-    append('personas.txt'), % Abre el archivo en modo escritura
+    append('../data/personas.txt'), % Abre el archivo en modo escritura
     downcase_atom(Nombre, NombreMinuscula),
     downcase_atom(Puesto, PuestoMinuscula),
     downcase_atom(Tareas, TareasMinuscula),
@@ -116,12 +102,6 @@ comprueba_Tareas(Palabra) :-
 % Restricciones: El valor debe de ser un numero
 es_numero(Valor) :- number(Valor).
 
-%Falta
-% Validar existencia de personas 
-
-
-
-
 % Predicado para leer una línea desde el archivo
 read_line(Stream, Line) :-
     read_line_to_string(Stream, LineStr),
@@ -132,10 +112,15 @@ read_line(Stream, Line) :-
     ).
 
 % Predicado para imprimir el contenido del archivo en el formato deseado
-imprimir_contenido_del_txt(NombreArchivo) :-
-    open(NombreArchivo, read, Stream),
-    leer_y_mostrar_lineas(Stream),
-    close(Stream).
+imprimir_Personas:-
+    nl,nl,mssg_mostrar,
+    (
+        archivo_existe('../data/personas.txt') ->
+        open('../data/personas.txt', read, Stream),
+        leer_y_mostrar_lineas(Stream),
+        close(Stream), controladorPrincipal_Personas;
+        alerta_4
+    ).
 
 leer_y_mostrar_lineas(Stream) :-
     read_line(Stream, Line),
@@ -147,19 +132,23 @@ leer_y_mostrar_lineas(Stream) :-
 
 % Predicado para mostrar la información en el formato deseado
 mostrar_informacion([Nombre, Puesto, Costo, Rating, Tipo]) :-
-    format('Nombre: ~w~n', [Nombre]),
-    format('Puesto: ~w~n', [Puesto]),
-    format('Costo por Tarea: ~w~n', [Costo]),
-    format('Rating: ~w~n', [Rating]),
-    format('Tipo de Tareas: ~w~n', [Tipo]),
+    write('╭────────────────────────────────────────────────╮'), nl,
+    format('         Información de la Persona: ~w~n', [Nombre]),
+    write('╰────────────────────────────────────────────────╯'), nl,
+    format('  • Puesto:             ~w~n', [Puesto]),
+    format('  • Costo por Tarea:    ₡ ~w~n', [Costo]),
+    format('  • Rating:             ★ ~w~n', [Rating]),
+    format('  • Tipo de Tareas:     ~w~n', [Tipo]),
     nl. % Línea en blanco entre registros
 
-
+% Verifica si el archivo existe
+archivo_existe(NombreArchivo) :- 
+    exists_file(NombreArchivo).
 
 
 % Predicado para verificar si un nombre existe en el archivo
 nombre_existe(NombreBuscado) :-
-    open('personas.txt', read, Stream),
+    open('../data/personas.txt', read, Stream),
     nombre_existe_en_archivo(NombreBuscado, Stream),
     close(Stream).
 
@@ -192,6 +181,13 @@ vista_indicacion:-
     write('│           para crear una Persona en la base de conocimiento.        │'), nl,
     write('╰─────────────────────────────────────────────────────────────────────╯'), nl.
 
+mssg_mostrar:-
+    write('╭─────────────────────────────────────────────────────────────────────────────────╮'), nl,
+    write('│  MENSAJE: A continuación se mostrará la información de la base de conocimiento  │'), nl,
+    write('│           registrada con respecto a las personas.                               │'), nl,
+    write('╰─────────────────────────────────────────────────────────────────────────────────╯'), nl.
+    
+
 alerta_1:-
     nl,nl,
     write('             ╭─────────────────────────────────────────╮'), nl,
@@ -219,13 +215,40 @@ alerta_2:-
     write('             │  Nota: Debe de ser un numeró       │'), nl,
     write('             ╰────────────────────────────────────╯').
 
+alerta_3:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  La Tarea indicada es invalida     │'), nl,
+    write('             │  Nota: Debe de ser una existente   │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
+alerta_4:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  No se encuentran registros de     │'), nl,
+    write('             │  Personas                          │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
+load:-
+    write('             ╭─────   Registrando persona   ─────╮'), nl,
+    write('             │          Guardando datos...       │'), nl,
+    write('             ╰───────────────────────────────────╯'), nl.
+
+
 %                   Seccion de Controladores
+
+% Funcion encargada de mostrar el menu principal
+% Inicializador 
+% Restricciones: Se debe de seleccionar alguna de las opciones disponibles
 controladorPrincipal_Personas:-
     vistaPrincipal_Personas,
     read_line(OpcionCodes),
     atom_codes(OpcionAtom, OpcionCodes),
     (
         atom_number(OpcionAtom, Opcion), Opcion == 1, datosPersona;
-        atom_number(OpcionAtom, Opcion), Opcion == 2, write('develop');
+        atom_number(OpcionAtom, Opcion), Opcion == 2, imprimir_Personas;
+        atom_number(OpcionAtom, Opcion), Opcion == 0, consult('app.pl'), menu_administrativo;
         nl,write('La opcion ingresada no es valida'),nl,write(''),nl,controladorPrincipal_Personas
     ).
