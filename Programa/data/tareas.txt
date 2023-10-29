@@ -1,3 +1,5 @@
-PROYECTO,Pendiente,sin asignar,sin fecha cierre
-PROYECTO 1,Pendiente,sin asignar,sin fecha de cierre
-proyecto 4,Pendiente,sin asignar,sin fecha de cierre
+asigment,Pendiente,sin asignar,sin fecha cierre
+update,Pendiente,sin asignar,sin fecha de cierre
+load,Pendiente,sin asignar,sin fecha de cierre
+carga,Pendiente,sin asignar,sin fecha de cierre
+reset,Pendiente,sin asignar,sin fecha de cierre

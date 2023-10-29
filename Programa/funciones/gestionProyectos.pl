@@ -206,8 +206,6 @@ archivo_existe(NombreArchivo) :-
     exists_file(NombreArchivo).
 
 
-
-
 mostrar_datos :-
     nl,nl,mssg_mostrarProyectos,
     (

@@ -24,26 +24,32 @@ datosPersona:-
     atom_string(NombreAtom, Nombre),
     downcase_atom(Nombre, NombreMinuscula),
     (
+        %valida Vacio
+        
         %Valida existencia de la persona
-        nombre_existe(NombreMinuscula),nl,write('Error: el nombre ya se encuentra registrado'),nl,write(''),nl,datosPersona 
-        ;
-        write('►Ingrese el puesto de la persona: '),
+        nombre_existe(NombreMinuscula),nl,alerta_6,nl,datosPersona 
+        ;(validaVacio(NombreMinuscula),nl,alerta_5,nl,datosPersona )
+        ;write('►Ingrese el puesto de la persona: '),
         read_line(PuestoCodes),
         atom_codes(PuestoAtom, PuestoCodes),
         atom_string(PuestoAtom, Puesto),
         (
+            (validaVacio(Puesto),nl,alerta_5,nl,datosPersona);
             downcase_atom(Puesto, PuestoMinuscula),
             comprueba_Tareas(PuestoMinuscula), % Verifica que el puesto sea valido
             write('►Ingrese el costo de la persona: '),
             read_line(CostoCodes),
             atom_codes(CostoAtom, CostoCodes),
+            atom_string(CostoAtom, PuestoData),
             (
+                (validaVacio(PuestoData),nl,alerta_5,nl,datosPersona) ;
                 atom_number(CostoAtom, Costo), % Convierte a numero el string y Verifica que el costo sea un numero
                 write('►Ingrese el rating de la persona: '),
                 read_line(RatingCodes),
                 atom_codes(RatingAtom, RatingCodes),
-                
+                atom_string(CostoAtom, RatingData),
                 (   
+                    (validaVacio(RatingData),nl,alerta_5,nl,datosPersona) ;
                     atom_number(RatingAtom, Rating), % Convierte a numero el string y Verifica que el rating sea un numero
                     write('►Ingrese las tareas de la persona: '),
                     read_line(TareasCodes),
@@ -51,12 +57,18 @@ datosPersona:-
                     atom_string(TareasAtom, Tareas),
                     downcase_atom(Tareas, TareasMinuscula),nl,
 
-                    % Registra La Persona
-                    write('╭────────────────────────────────────────────╮'), nl,
-                    format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
-                    nl,load,
-                    registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula);
-                    alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
+                    (\+validaVacio(TareasMinuscula)) ->
+                        (
+                            consult('gestionTareas.pl'),buscar_nombreTarea(TareasMinuscula) ->
+                            (
+                                % Registra La Persona
+                                write('╭────────────────────────────────────────────╮'), nl,
+                                format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
+                                nl,load,
+                                registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula),controladorPrincipal_Personas;
+                                alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
+                            ) ;nl,alerta_7,nl,datosPersona
+                        ) ; nl,alerta_5,nl,datosPersona
                 )
                 ;alerta_2,datosPersona
             )
@@ -87,8 +99,29 @@ registraPersona(Nombre,Puesto,Costo,Reating,Tareas) :-   %Ejemplo: registraPerso
     nl,
     told.  % Cierra el archivo
 
+% Funcion encargada de pedir las tareas de la persona
+% Entradas: [], Tareas %% Una lista vacia y la lista de tareas que servira como res
+% Salidas: Lista de tareas
+% Restricciones: Las tareas deben de ser validas y no deben de estar vacias
+obtener_tareas(TareasActuales, TareasFinales) :-
+    write('►Ingrese una tarea (o "fin" para finalizar): '),
+    read_line(TareasCodes),
+    atom_codes(TareasAtom, TareasCodes),
+    atom_string(TareasAtom, Tareas),
+    downcase_atom(Tareas, TareasMinuscula),
+    (TareasMinuscula = 'fin' ->
+        TareasFinales = TareasActuales
+    ; 
+        append(TareasActuales, [Tareas], NuevasTareas),
+        obtener_tareas(NuevasTareas, TareasFinales)
+    ).
+
 % Validaciones
 
+
+% Predicado para validar que la tarea no sea vacía
+validaVacio(Dato) :-
+    string_length(Dato, 0).
 % Tareas Disponibles
 % Entradas: String
 % Restricciones: La tarea debe de pertenecer al registro
@@ -231,6 +264,27 @@ alerta_4:-
     write('             │  Personas                          │'), nl,
     write('             ╰────────────────────────────────────╯').
 
+alerta_5:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  No se permiten datos vaciós       │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
+alerta_6:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  Ya hay registros relacionados     │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
+alerta_7:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  Debe de indicar una tarea que se  │'), nl,
+    write('             │  encuentre registrada              │'), nl,
+    write('             ╰────────────────────────────────────╯').
 load:-
     write('             ╭─────   Registrando persona   ─────╮'), nl,
     write('             │          Guardando datos...       │'), nl,
