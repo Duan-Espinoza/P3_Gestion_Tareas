@@ -31,7 +31,8 @@ ejecutar(Opcion):-
 % Restricciones: Los datos deben de ser validos y no deben de estar vacios
 
 datosPersona:-
-    write('Ingrese el nombre de la persona: '),
+    nl, vista_indicacion, nl, 
+    write('►Ingrese el nombre de la persona: '),
     read_line(NombreCodes),
     atom_codes(NombreAtom, NombreCodes),
     atom_string(NombreAtom, Nombre),
@@ -40,40 +41,40 @@ datosPersona:-
         %Valida existencia de la persona
         nombre_existe(NombreMinuscula),nl,write('Error: el nombre ya se encuentra registrado'),nl,write(''),nl,datosPersona 
         ;
-        write('Ingrese el puesto de la persona: '),
+        write('►Ingrese el puesto de la persona: '),
         read_line(PuestoCodes),
         atom_codes(PuestoAtom, PuestoCodes),
         atom_string(PuestoAtom, Puesto),
         (
             downcase_atom(Puesto, PuestoMinuscula),
             comprueba_Tareas(PuestoMinuscula), % Verifica que el puesto sea valido
-            write('Ingrese el costo de la persona: '),
+            write('►Ingrese el costo de la persona: '),
             read_line(CostoCodes),
             atom_codes(CostoAtom, CostoCodes),
             (
                 atom_number(CostoAtom, Costo), % Convierte a numero el string y Verifica que el costo sea un numero
-                write('Ingrese el rating de la persona: '),
+                write('►Ingrese el rating de la persona: '),
                 read_line(RatingCodes),
                 atom_codes(RatingAtom, RatingCodes),
                 
                 (   
                     atom_number(RatingAtom, Rating), % Convierte a numero el string y Verifica que el rating sea un numero
-                    write('Ingrese las tareas de la persona: '),
+                    write('►Ingrese las tareas de la persona: '),
                     read_line(TareasCodes),
                     atom_codes(TareasAtom, TareasCodes),
                     atom_string(TareasAtom, Tareas),
                     downcase_atom(Tareas, TareasMinuscula),nl,
 
                     % Registra La Persona
-                    write('----------------------------------------------'), nl,
-                    format('----       Los datos ingresados son      ----~n----------------------------------------------~n  Nombre: ~w~n  Puesto: ~w~n  Costo: ~w~n  Rating: ~w~n  Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
+                    write('╭────────────────────────────────────────────╮'), nl,
+                    format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo :  ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
                     write('Guardando datos...'),
                     registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula)
                     ;nl,write('Las tareas no son validas'),nl,write(''),nl,datosPersona
                 )
-                ;nl,write('El costo debe de ser un numero'),nl,write(''),nl,datosPersona
+                ;alerta_2,datosPersona
             )
-            ;nl,write('El puesto no es valido'),nl,write('Nota: Diseño debe ser Disenio'),nl,write(''),nl,datosPersona
+            ;alerta_1,nl,write(''),nl,datosPersona
         )
     ).
 
@@ -168,4 +169,63 @@ nombre_existe_en_archivo(NombreBuscado, Stream) :-
         Line = [Nombre | _], % Obtiene el primer elemento (nombre) de la línea
         (Nombre = NombreBuscado ; nombre_existe_en_archivo(NombreBuscado, Stream))
     ; false
+    ).
+
+
+%                   Seccion de Vistas 
+
+vistaPrincipal_Personas:-
+    nl,nl,
+    write('╭──────────────────────────────────╮'), nl,
+    write('│     MENÚ GESTION DE PERSONAS     │'), nl,
+    write('├──────────────────────────────────┤'), nl,
+    write('│ 1. Agregar Persona               │'), nl,
+    write('│ 2. Mostrar Personas              │'), nl,
+    write('│ 0. Volver                        │'), nl,
+    write('╰──────────────────────────────────╯'), nl,
+    write('Ingrese una de las Opciones mostradas: ').
+
+vista_indicacion:-
+    nl,nl,
+    write('╭─────────────────────────────────────────────────────────────────────╮'), nl,
+    write('│  MENSAJE: A continuación rellene la información que se le solicita  │'), nl,
+    write('│           para crear una Persona en la base de conocimiento.        │'), nl,
+    write('╰─────────────────────────────────────────────────────────────────────╯'), nl.
+
+alerta_1:-
+    nl,nl,
+    write('             ╭─────────────────────────────────────────╮'), nl,
+    write('             │               ⚠ ALERTA ⚠                │'), nl,
+    write('             │                                         │'), nl,
+    write('             │  Puesto no es válido                    │'), nl,
+    write('             │                                         │'), nl,
+    write('             │  Solo se admite:                        │'), nl,
+    write('             │              ✔ Requerimientos           │'), nl,
+    write('             │              ✔ Disenio                  │'), nl,
+    write('             │              ✔ Desarrollo               │'), nl,
+    write('             │              ✔ QA                       │'), nl,
+    write('             │              ✔ FullStack                │'), nl,
+    write('             │              ✔ FrontEnd                 │'), nl,
+    write('             │              ✔ BackEnd                  │'), nl,
+    write('             │              ✔ Administracion           │'), nl,
+    write('             ╰─────────────────────────────────────────╯').
+
+
+alerta_2:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  Costo no es válido                │'), nl,
+    write('             │  Nota: Debe de ser un numeró       │'), nl,
+    write('             ╰────────────────────────────────────╯').
+
+%                   Seccion de Controladores
+controladorPrincipal_Personas:-
+    vistaPrincipal_Personas,
+    read_line(OpcionCodes),
+    atom_codes(OpcionAtom, OpcionCodes),
+    (
+        atom_number(OpcionAtom, Opcion), Opcion == 1, datosPersona;
+        atom_number(OpcionAtom, Opcion), Opcion == 2, write('develop');
+        nl,write('La opcion ingresada no es valida'),nl,write(''),nl,controladorPrincipal_Personas
     ).
