@@ -20,6 +20,24 @@ cargar_tareas :-
     close(Stream).
 
 
+% Predicado para cargar proyectos desde un archivo
+cargar_proyectos_desde_archivo(Stream) :-
+    repeat,
+    read(Stream, Proyecto),
+    (   Proyecto == end_of_file -> ! ;
+        assert(Proyecto), fail
+    ).
+
+% Predicado para cargar tareas desde un archivo
+cargar_tareas_desde_archivo(Stream) :-
+    repeat,
+    read(Stream, Tarea),
+    (   Tarea == end_of_file -> ! ;
+        assert(Tarea), fail
+    ).
+
+
+
 % Estatus financiero de un proyecto
 estatus_financiero(NombreProyecto, Estatus) :-
     cargar_proyectos,  % Cargar proyectos antes de calcular el estatus financiero
