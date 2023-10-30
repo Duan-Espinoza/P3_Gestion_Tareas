@@ -1,4 +1,4 @@
-proyecto 1,Pendiente,sin asignar,sin fecha cierre
+proyecto 1,activo,[[Aaron,Backend],[Duan,frontEnd]],sin fecha cierre
 proyecto 2,Pendiente,sin asignar,sin fecha cierre
 proyecto 3,Pendiente,sin asignar,sin fecha cierre
 proyecto 4,Pendiente,sin asignar,sin fecha cierre
