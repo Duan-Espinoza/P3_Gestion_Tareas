@@ -146,6 +146,10 @@ registraProyecto(Nombre, Empresa, Presupuesto, FechaInicio, FechaFin) :-   %Ejem
 
 %                   Validaciones
 
+% Predicado para validar que la tarea no sea vacía
+validaVacio(Dato) :-
+    string_length(Dato, 0).
+
 % Verifica que la fecha sea válida %% dd/mm/aaaa
 fecha_valida(Fecha) :-
 atomic(Fecha), % Verifica que el argumento sea un átomo (string)
@@ -238,3 +242,8 @@ formatar_y_mostrar(Line) :-
     format('  • Presupuesto: ₡ ~w~n', [Presupuesto]),
     format('  • Fecha de Inicio: ~w~n', [FechaInicio]),
     format('  • Fecha de Finalización: ~w~n~n', [FechaFin]).
+
+
+
+%FALTA
+% VALIDACIONES

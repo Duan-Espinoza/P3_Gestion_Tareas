@@ -1,7 +1,9 @@
-aaron,backend,20.0,10,proyecto 1
-hansol,frontend,20.0,10,proyecto 2
-duan,disenio,10000,5,proyecto 2
-esteban,disenio,43123,2,proyecto 3
-estafani,disenio,87123,10,proyecto 5
-jesie,disenio,12,12,load
-jesenia,disenio,12000,12,reset
+aaron,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
+hansol,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
+duan,programador,5,[[backend, 13], [frontend, 13], [qa, 45]]
+esteban,programador,2,[[backend, 13], [frontend, 13], [qa, 45]]
+estafani,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
+jesie,programador,12,12,[[backend, 13], [frontend, 13], [qa, 45]]
+jesenia,programador,12,[[backend, 13], [frontend, 13], [qa, 45]]
+alexandra,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
+juan,programador,5,[[backend,13],[disenio,15],[qa,14]]
