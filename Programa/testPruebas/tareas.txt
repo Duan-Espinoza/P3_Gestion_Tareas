@@ -1,6 +1,3 @@
 proyecto 1,Pendiente,sin asignar,sin fecha cierre
 proyecto 2,Pendiente,sin asignar,sin fecha cierre
 proyecto 3,Pendiente,sin asignar,sin fecha cierre
-proyecto 4,Pendiente,sin asignar,sin fecha cierre
-proyecto 6,Pendiente,sin asignar,sin fecha cierre
-proyecto 7,Pendiente,sin asignar,sin fecha cierre
