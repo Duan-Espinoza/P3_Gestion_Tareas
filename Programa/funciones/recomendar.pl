@@ -35,7 +35,7 @@ calcular_puntuacion_persona(NombreProyecto, NombreTarea, NombrePersona, Puntuaci
 % *********************************************************
 % Esta es la funcionalidad a llamar para mostrar recomendaciones
 % Aqui se solicitan nombre de proyecto y nombre de tarea
-%********************************************************
+% ********************************************************
 % Recomendar personas para un proyecto y una tarea específicos.
 recomendar_personas(NombreProyecto, NombreTarea) :-
     cargar_base_conocimientos, % Cargar proyectos, tareas y personas.
