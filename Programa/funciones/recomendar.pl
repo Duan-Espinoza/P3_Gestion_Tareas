@@ -8,6 +8,9 @@ cargar_base_conocimientos :-
     cargar_tareas,
     cargar_personas.
 
+% **********************************************************
+% La funcionalidad del rating 
+% **************************************************
 % Calcula la puntuación de una persona para un proyecto y una tarea específicos.
 calcular_puntuacion_persona(NombreProyecto, NombreTarea, NombrePersona, Puntuacion) :-
     % Desarrollo Previo: Por cada tarea asignada del tipo, suma 2 ptos.
@@ -28,6 +31,11 @@ calcular_puntuacion_persona(NombreProyecto, NombreTarea, NombrePersona, Puntuaci
     % Calcular la puntuación total.
     Puntuacion is PuntosDesarrolloPrevio + PuntosAfinidadProyecto + PuntosRating + PuntosTareasAbiertas.
 
+
+% *********************************************************
+% Esta es la funcionalidad a llamar para mostrar recomendaciones
+% Aqui se solicitan nombre de proyecto y nombre de tarea
+%********************************************************
 % Recomendar personas para un proyecto y una tarea específicos.
 recomendar_personas(NombreProyecto, NombreTarea) :-
     cargar_base_conocimientos, % Cargar proyectos, tareas y personas.
@@ -68,6 +76,8 @@ calcular_y_almacenar_puntuaciones(NombreProyecto, NombreTarea, [Persona|RestoPer
     calcular_puntuacion_persona(NombreProyecto, NombreTarea, Persona, Puntuacion),
     calcular_y_almacenar_puntuaciones(NombreProyecto, NombreTarea, RestoPersonas, RestoPuntuaciones).
 
+
+% *****************************************
 % Predicado para mostrar las personas recomendadas con sus puntuaciones y tipos de tareas.
 mostrar_personas_recomendadas([]).
 mostrar_personas_recomendadas([(Persona, Puntuacion)|RestoPersonas]) :-
@@ -77,15 +87,19 @@ mostrar_personas_recomendadas([(Persona, Puntuacion)|RestoPersonas]) :-
     nl,
     mostrar_personas_recomendadas(RestoPersonas).
 
+**********************************************
 % Predicado para mostrar los tipos de tareas que realiza una persona.
 mostrar_tipos_de_tareas_persona(Persona) :-
     findall(TipoTarea, tarea(_, Persona, _, TipoTarea), TiposTareas),
     list_to_set(TiposTareas, TiposTareasUnicos),
     write('Tipos de Tareas que Realiza: '), write(TiposTareasUnicos), nl.
 
+
+% ******************************************************************
 % Ejemplo de uso para recomendar personas para un proyecto y una tarea específicos.
 % al llamarse esta funcion se reemplaza 'NombreProyecto' y 'NombreTarea' en este predicado 
 % con los nombres de proyecto y tarea para los cuales deseas obtener recomendaciones
+% *******************************************************************
 ejemplo_recomendacion :-
     recomendar_personas('NombreProyecto', 'NombreTarea').
 
