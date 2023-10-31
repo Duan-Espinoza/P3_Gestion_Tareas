@@ -47,7 +47,9 @@ agregarTarea :-
     assertz(tarea(Proyecto, Nombre, Tipo, 'Pendiente', 'Sin asignar', 'Sin cerrar')), % Agregar la tarea como hecho dinámico
     write('\nTarea agregada con éxito.'), nl.
 
-
+% ----------------------------------------------------------------
+% Correciones importantes a esta Funcionalidad
+% Manejo de txt
 
 asignarTarea :-
     write('\nIngrese el nombre del proyecto: '),
@@ -58,19 +60,30 @@ asignarTarea :-
     read(Persona),
     write('Ingrese el nombre de la tarea asignada: '),
     read(TareaAsignada),
+    % Leer el archivo tareas.txt
+    cargar_desde_archivo('../data/tareas.txt'),
     % Obtener la tarea actual
     tarea(Proyecto, Nombre, Tipo, Estado, Asignaciones, 'Sin fecha cierre'),
-    % Verificar si ya hay asignaciones y construir la nueva asignación
-    (Asignaciones == 'Sin asignar' ->
+    % Verificar si el estado es "Pendiente"
+    (Estado == 'Pendiente' ->
+        % Si el estado es "Pendiente," cambiarlo a "Activo" y agregar la asignación
+        NuevoEstado = 'Activo',
         NuevaAsignacion = [[Persona, TareaAsignada]]
-    ;   atomic_list_concat([',', Asignaciones, '|', [Persona, TareaAsignada]], NuevaAsignacion)
+    ;   % Si el estado no es "Pendiente," no se realiza la asignación
+        NuevoEstado = Estado,
+        NuevaAsignacion = Asignaciones
     ),
-    % Actualizar el estado y las asignaciones de la tarea
+    % Actualizar el estado y las asignaciones de la tarea en memoria
     retract(tarea(Proyecto, Nombre, Tipo, Estado, Asignaciones, 'Sin fecha cierre')),
-    assertz(tarea(Proyecto, Nombre, Tipo, 'Activo', NuevaAsignacion, 'Sin fecha cierre')),
-    write('\nTarea asignada a '), write(Persona), write(' como '), write(TareaAsignada), write(' y su estado se ha cambiado a Activo.'), nl.
+    assertz(tarea(Proyecto, Nombre, Tipo, NuevoEstado, NuevaAsignacion, 'Sin fecha cierre')),
+    % Guardar los cambios en el archivo tareas.txt
+    guardar_en_archivo('../data/tareas.txt'),
+    % Mostrar mensaje de resultado
+    write('\nTarea asignada a '), write(Persona), write(' como '), write(TareaAsignada), write(' y su estado se ha cambiado a '), write(NuevoEstado), nl.
 
 
+
+% ============================================================================
 
 
 
