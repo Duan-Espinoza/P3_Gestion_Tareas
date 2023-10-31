@@ -47,7 +47,8 @@ agregarTarea :-
     assertz(tarea(Proyecto, Nombre, Tipo, 'Pendiente', 'Sin asignar', 'Sin cerrar')), % Agregar la tarea como hecho dinámico
     write('\nTarea agregada con éxito.'), nl.
 
-% Función para asignar una tarea a una persona y cambiar su estado a "Activa"
+
+
 asignarTarea :-
     write('\nIngrese el nombre del proyecto: '),
     read(Proyecto),
@@ -55,9 +56,23 @@ asignarTarea :-
     read(Nombre),
     write('Ingrese el nombre de la persona asignada: '),
     read(Persona),
-    retract(tarea(Proyecto, Nombre, Tipo, 'Pendiente', 'Sin asignar', 'Sin cerrar')),
-    assertz(tarea(Proyecto, Nombre, Tipo, 'Activa', Persona, 'Sin cerrar')), % Actualizar el estado y la persona asignada
-    write('\nTarea asignada a '), write(Persona), write(' y su estado se ha cambiado a Activa.'), nl.
+    write('Ingrese el nombre de la tarea asignada: '),
+    read(TareaAsignada),
+    % Obtener la tarea actual
+    tarea(Proyecto, Nombre, Tipo, Estado, Asignaciones, 'Sin fecha cierre'),
+    % Verificar si ya hay asignaciones y construir la nueva asignación
+    (Asignaciones == 'Sin asignar' ->
+        NuevaAsignacion = [[Persona, TareaAsignada]]
+    ;   atomic_list_concat([',', Asignaciones, '|', [Persona, TareaAsignada]], NuevaAsignacion)
+    ),
+    % Actualizar el estado y las asignaciones de la tarea
+    retract(tarea(Proyecto, Nombre, Tipo, Estado, Asignaciones, 'Sin fecha cierre')),
+    assertz(tarea(Proyecto, Nombre, Tipo, 'Activo', NuevaAsignacion, 'Sin fecha cierre')),
+    write('\nTarea asignada a '), write(Persona), write(' como '), write(TareaAsignada), write(' y su estado se ha cambiado a Activo.'), nl.
+
+
+
+
 
 % Función para cerrar una tarea
 cerrarTarea :-
@@ -75,6 +90,10 @@ cerrarTarea :-
     retract(tarea(Proyecto, Nombre, Tipo, 'Activa', Asignado, 'Sin cerrar')),
     assertz(tarea(Proyecto, Nombre, Tipo, 'Finalizada', Asignado, FechaCierre)), % Actualizar el estado y la fecha de cierre
     write('\nTarea cerrada con éxito el '), write(FechaCierre), write(' y su estado se ha cambiado a Finalizada.'), nl.
+
+
+
+
 
 % Función para buscar tareas libres (pendientes)
 buscarTareasLibres :-
