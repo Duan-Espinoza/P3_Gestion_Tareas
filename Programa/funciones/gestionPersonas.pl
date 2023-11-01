@@ -27,7 +27,7 @@ datosPersona:-
         %valida Vacio
         
         %Valida existencia de la persona
-        nombre_existe(NombreMinuscula),nl,alerta_6,nl,datosPersona 
+        nombre_registrado(NombreMinuscula),nl,alerta_6,nl,datosPersona 
         ;(validaVacio(NombreMinuscula),nl,alerta_5,nl,datosPersona )
         ;write('►Ingrese el puesto de la persona: '),
         read_line(PuestoCodes),
@@ -36,43 +36,32 @@ datosPersona:-
         (
             (validaVacio(Puesto),nl,alerta_5,nl,datosPersona);
             downcase_atom(Puesto, PuestoMinuscula),
-            comprueba_Tareas(PuestoMinuscula), % Verifica que el puesto sea valido
-            write('►Ingrese el costo de la persona: '),
-            read_line(CostoCodes),
-            atom_codes(CostoAtom, CostoCodes),
-            atom_string(CostoAtom, PuestoData),
             (
-                (validaVacio(PuestoData),nl,alerta_5,nl,datosPersona) ;
-                atom_number(CostoAtom, Costo), % Convierte a numero el string y Verifica que el costo sea un numero
                 write('►Ingrese el rating de la persona: '),
                 read_line(RatingCodes),
                 atom_codes(RatingAtom, RatingCodes),
-                atom_string(CostoAtom, RatingData),
+                atom_string(RatingAtom, RatingData),
                 (   
-                    (validaVacio(RatingData),nl,alerta_5,nl,datosPersona) ;
+                    (validaVacio(RatingData),nl,alerta_5,nl,datosPersona);
+                    (
                     atom_number(RatingAtom, Rating), % Convierte a numero el string y Verifica que el rating sea un numero
-                    write('►Ingrese las tareas de la persona: '),
-                    read_line(TareasCodes),
-                    atom_codes(TareasAtom, TareasCodes),
-                    atom_string(TareasAtom, Tareas),
-                    downcase_atom(Tareas, TareasMinuscula),nl,
-
-                    (\+validaVacio(TareasMinuscula)) ->
+                    obtener_tareas([], TareasFinales) ->
                         (
-                            consult('gestionTareas.pl'),buscar_nombreTarea(TareasMinuscula) ->
-                            (
-                                % Registra La Persona
-                                write('╭────────────────────────────────────────────╮'), nl,
-                                format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, Tareas]),nl,
-                                nl,load,
-                                registraPersona(NombreMinuscula,PuestoMinuscula,Costo,Rating,TareasMinuscula),controladorPrincipal_Personas;
-                                alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
-                            ) ;nl,alerta_7,nl,datosPersona
-                        ) ; nl,alerta_5,nl,datosPersona
+                            % Registra La Persona
+                            nl,nl,
+                            write('╭────────────────────────────────────────────╮'), nl,
+                            format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, TareasFinales]),nl,
+                            nl,load,
+                            registraPersona(NombreMinuscula,PuestoMinuscula,Rating,TareasFinales), controladorPrincipal_Personas;
+                            alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
+                        ) 
+                    % Valida que rating sea numero                   
+                    ;nl,nl,write('ERROR: Valor de Rating debe ser un numero'),nl,nl,datosPersona
+                    )
                 )
-                ;alerta_2,datosPersona
-            )
-            ;alerta_1,nl,write(''),nl,datosPersona
+
+            );nl,alerta_5,nl,datosPersona
+            
         )
     ).
 
@@ -82,39 +71,60 @@ datosPersona:-
 % Entradas: Nombre, Puesto, Costo, Reating, Tareas
 % Salidas: Archivo con los datos de la persona
 % Restricciones: El archivo debe de existir
-registraPersona(Nombre,Puesto,Costo,Reating,Tareas) :-   %Ejemplo: registraPersona('personas.txt', 'Juan', 'Gerente', 5000, 4.5).
+registraPersona(Nombre,Puesto,Reating,Tareas) :-   %Ejemplo: registraPersona('personas.txt', 'Juan', 'Gerente', 5000, 4.5).
     append('../data/personas.txt'), % Abre el archivo en modo escritura
     downcase_atom(Nombre, NombreMinuscula),
     downcase_atom(Puesto, PuestoMinuscula),
-    downcase_atom(Tareas, TareasMinuscula),
     write(NombreMinuscula),
     write(","),
     write(PuestoMinuscula),
     write(","),
-    write(Costo),
-    write(","),
     write(Reating),
     write(","),
-    write(TareasMinuscula),
+    write(Tareas),
     nl,
     told.  % Cierra el archivo
 
-% Funcion encargada de pedir las tareas de la persona
-% Entradas: [], Tareas %% Una lista vacia y la lista de tareas que servira como res
+% Función encargada de pedir las tareas de la persona
+% Entradas: [], Tareas %% Una lista vacía y la lista de tareas que servirá como resultado
 % Salidas: Lista de tareas
-% Restricciones: Las tareas deben de ser validas y no deben de estar vacias
+% Restricciones: Las tareas deben ser válidas y no deben estar vacías
+% Función encargada de pedir las tareas de la persona
+% Entradas: [], Tareas %% Una lista vacía y la lista de tareas que servirá como resultado
+% Salidas: Lista de tareas
+% Restricciones: Las tareas deben ser válidas y no deben estar vacías
 obtener_tareas(TareasActuales, TareasFinales) :-
     write('►Ingrese una tarea (o "fin" para finalizar): '),
     read_line(TareasCodes),
     atom_codes(TareasAtom, TareasCodes),
     atom_string(TareasAtom, Tareas),
     downcase_atom(Tareas, TareasMinuscula),
-    (TareasMinuscula = 'fin' ->
-        TareasFinales = TareasActuales
-    ; 
-        append(TareasActuales, [Tareas], NuevasTareas),
-        obtener_tareas(NuevasTareas, TareasFinales)
-    ).
+    \+ validaVacio(TareasMinuscula) -> 
+    (
+        % Registra La Persona
+        (TareasMinuscula = 'fin' ->
+            TareasFinales = TareasActuales
+            ; 
+            %Se valida que pertenezca a las posibles opciones de tareas
+            comprueba_Tareas(TareasMinuscula) ->
+            (
+                consult('gestionTareas.pl'),buscar_nombreTarea(TareasMinuscula) ->
+                    write('►Ingrese el costo de la tarea: '),
+                    read_line(CostoCodes),
+                    atom_codes(CostoAtom, CostoCodes),
+                    atom_string(CostoAtom, CostoString),
+                    downcase_atom(CostoString, CostoMinuscula),
+                    atom_number(CostoMinuscula, CostoNumero),
+                    downcase_atom(TareasMinuscula, TareaMinuscula), % Convierte la tarea a minúsculas
+                    append(TareasActuales, [[TareaMinuscula, CostoNumero]], NuevasTareas), % Agrega el par [Tarea, Costo]
+                    obtener_tareas(NuevasTareas, TareasFinales)
+                    ;nl,alerta_7,nl,obtener_tareas(TareasActuales, TareasFinales)
+            );nl,alerta_1,nl, write('NOTA: Se reiniciará el conteo de tareas'),nl,nl,obtener_tareas(TareasActuales, TareasFinales)
+        )
+    ); nl, alerta_5, nl, write('NOTA: Se reiniciará el conteo de tareas'), nl, nl, obtener_tareas([], TareasFinales).
+
+
+
 
 % Validaciones
 
@@ -135,63 +145,72 @@ comprueba_Tareas(Palabra) :-
 % Restricciones: El valor debe de ser un numero
 es_numero(Valor) :- number(Valor).
 
-% Predicado para leer una línea desde el archivo
-read_line(Stream, Line) :-
-    read_line_to_string(Stream, LineStr),
-    (LineStr \== end_of_file -> 
-        atomic_list_concat(LineList, ',', LineStr), % Separa la línea por comas
-        Line = LineList ;    
-        Line = end_of_file 
-    ).
 
-% Predicado para imprimir el contenido del archivo en el formato deseado
-imprimir_Personas:-
+
+muestraPersonas:-
     nl,nl,mssg_mostrar,
     (
         archivo_existe('../data/personas.txt') ->
-        open('../data/personas.txt', read, Stream),
-        leer_y_mostrar_lineas(Stream),
-        close(Stream), controladorPrincipal_Personas;
-        alerta_4,controladorPrincipal_Personas
+        (
+            open('../data/personas.txt', read, Stream),
+            read_lines(Stream),
+            close(Stream),nl,nl,controladorPrincipal_Personas
+        );alerta_4,controladorPrincipal_Personas
     ).
 
-leer_y_mostrar_lineas(Stream) :-
-    read_line(Stream, Line),
-    (Line \== end_of_file ->
-        mostrar_informacion(Line),
-        leer_y_mostrar_lineas(Stream)
-    ; true
-    ).
-
-% Predicado para mostrar la información en el formato deseado
-mostrar_informacion([Nombre, Puesto, Costo, Rating, Tipo]) :-
-    write('╭────────────────────────────────────────────────╮'), nl,
+read_lines(Stream) :-
+    \+ at_end_of_stream(Stream),
+    read_line_to_string(Stream, Line),
+    split_string(Line, ",", "", [Nombre, Puesto, Rating | Tareas]),
+    format('╭────────────────────────────────────────────────╮'), nl,
     format('         Información de la Persona: ~w~n', [Nombre]),
     write('╰────────────────────────────────────────────────╯'), nl,
     format('  • Puesto:             ~w~n', [Puesto]),
-    format('  • Costo por Tarea:    ₡ ~w~n', [Costo]),
     format('  • Rating:             ★ ~w~n', [Rating]),
-    format('  • Tipo de Tareas:     ~w~n', [Tipo]),
-    nl. % Línea en blanco entre registros
+    format('  • Tareas y Costo:     ~w~n', [Tareas]), nl,
+    read_lines(Stream).
+
+
+
+
 
 % Verifica si el archivo existe
 archivo_existe(NombreArchivo) :- 
     exists_file(NombreArchivo).
 
 
-% Predicado para verificar si un nombre existe en el archivo
-nombre_existe(NombreBuscado) :-
+% Busca si el nombre de la persona ya se encuentra registrado en la BC
+nombre_registrado(NombreABuscar) :-
+    % Abre el archivo en modo de lectura
     open('../data/personas.txt', read, Stream),
-    nombre_existe_en_archivo(NombreBuscado, Stream),
-    close(Stream).
-
-nombre_existe_en_archivo(NombreBuscado, Stream) :-
-    read_line(Stream, Line),
-    (Line \== end_of_file ->
-        Line = [Nombre | _], % Obtiene el primer elemento (nombre) de la línea
-        (Nombre = NombreBuscado ; nombre_existe_en_archivo(NombreBuscado, Stream))
-    ; false
+    % Lee cada línea del archivo
+    (   leer_linea(Stream, NombreABuscar) ->
+        % El nombre fue encontrado, cierra el archivo y retorna true
+        close(Stream),
+        true
+    ;   % El nombre no fue encontrado, cierra el archivo y retorna false
+        close(Stream),
+        false
     ).
+
+% Predicado para leer una línea y verificar si el nombre coincide
+leer_linea(Stream, NombreABuscar) :-
+    % Lee una línea del archivo como cadena
+    read_line_to_string(Stream, Linea),
+    % Comprueba si hemos llegado al final del archivo
+    (   Linea == end_of_file ->
+        false % El nombre no fue encontrado
+    ;   % Divide la línea en elementos separados por comas
+        atomic_list_concat(Elementos, ',', Linea),
+        % Compara el primer elemento con el NombreABuscar
+        (   Elementos = [NombreABuscar | _] ->
+            true % El nombre fue encontrado
+        ;   % Si el nombre no coincide, continuamos leyendo
+            leer_linea(Stream, NombreABuscar)
+        )
+    ).
+
+
 
 
 %                   Seccion de Vistas 
@@ -226,7 +245,7 @@ alerta_1:-
     write('             ╭─────────────────────────────────────────╮'), nl,
     write('             │               ⚠ ALERTA ⚠                │'), nl,
     write('             │                                         │'), nl,
-    write('             │  Puesto no es válido                    │'), nl,
+    write('             │  Tarea no es válida                     │'), nl,
     write('             │                                         │'), nl,
     write('             │  Solo se admite:                        │'), nl,
     write('             │              ✔ Requerimientos           │'), nl,
@@ -302,7 +321,7 @@ controladorPrincipal_Personas:-
     atom_codes(OpcionAtom, OpcionCodes),
     (
         atom_number(OpcionAtom, Opcion), Opcion == 1, datosPersona;
-        atom_number(OpcionAtom, Opcion), Opcion == 2, imprimir_Personas;
+        atom_number(OpcionAtom, Opcion), Opcion == 2, muestraPersonas;
         atom_number(OpcionAtom, Opcion), Opcion == 0, consult('app.pl'), menu_administrativo;
         nl,write('La opcion ingresada no es valida'),nl,write(''),nl,controladorPrincipal_Personas
     ).
