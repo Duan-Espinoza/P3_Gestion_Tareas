@@ -1,0 +1,14 @@
+Nombre del curso Lenguajes programacion
+b. Número de semestre y año lectivo 2 semestre 2023
+c. Nombre de los Estudiantes
+Duan Antonio Espinoza
+2019079490
+
+Aarón Piñar Mora
+2019063903
+
+
+e. Número del proyecto programado 3
+f. Fecha de entrega 1/11/2023
+g. Estatus de la entrega (debe ser CONGRUENTE con la solución entregada):  Bueno
+[Deplorable|Regular|Buena|MuyBuena|Excelente|Superior]

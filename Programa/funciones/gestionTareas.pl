@@ -23,11 +23,46 @@ mainTareas :-
         atom_number(OpcionAtom, Opcion), Opcion == 1,validaShow ;
         atom_number(OpcionAtom, Opcion), Opcion == 2, agregarTarea;
         atom_number(OpcionAtom, Opcion), Opcion == 3, validaAgregarTareaGes;
-        atom_number(OpcionAtom, Opcion), Opcion == 4, write('Develop');
-        atom_number(OpcionAtom, Opcion), Opcion == 5, write('Develop');
+        atom_number(OpcionAtom, Opcion), Opcion == 4, cierra;
+        atom_number(OpcionAtom, Opcion), Opcion == 5, buscaPendientes;
         atom_number(OpcionAtom, Opcion), Opcion == 6, consult('app.pl'),menu_administrativo;
         nl, write('Error: debe de ingresar una de las opciones mostradas'), nl, mainTareas
     ).
+% Funcionpara buscar una tarea
+buscaPendientes:-
+    archivo_existe('data/tareas.txt'),
+    (
+        nl,nl,consult('tareasLibres.pl'),mostrar_proyectosPendientes,nl,nl,mainTareas
+    );nl,nl,alerta_NotFound_Tareas,nl,nl,mainTareas.
+
+% Funcion para cerrar una tarea
+cierra:-
+    write('\nIngrese el nombre del proyecto: '),
+    read_line(ProyectoCodes),
+    atom_codes(ProyectoAtom, ProyectoCodes),
+    atom_string(ProyectoAtom, Proyecto),
+    downcase_atom(Proyecto, ProyectoMinuscula),nl,
+    
+    write('\nIngrese el nombre de la Tarea: '),
+    read_line(TareaCodes),
+    atom_codes(TareaAtom, TareaCodes),
+    atom_string(TareaAtom, Tarea),
+    downcase_atom(Tarea, TareasMinuscula),
+
+    write('\nIngrese la fecha de cierre: '),
+    read_line(FechaCodes),
+    atom_codes(FechaAtom, FechaCodes),
+    atom_string(FechaAtom, Fecha),
+
+    aux_validaAgrega(ProyectoMinuscula,Fecha,TareasMinuscula), 
+    consult('v_Tareas2.pl'), proyectos_modifi(ProyectoMinuscula,TareasMinuscula,Fecha).
+
+auxCierra(Proyecto,Fecha,Tarea):-
+    (\+ proyecto_existe(Proyecto),nl,nl,alerta_NotFound_Proyectos,nl,nl,fail);
+    (consult('v_Tareas.pl'),cargar_datos, \+ usuario_tiene_tarea(Persona,Tarea),alerta_SchTarea,nl,nl,fail);
+    (\+comprueba_Tareas(Tarea),nl,nl,alerta_1,fail);
+    (consult('gestionProyectos.pl'),\+ fecha_valida(Fecha),nl,nl,alerta_messageDate,fail);
+    nl,nl,write('Se cumplen los requisitos'),nl,nl.
 
 % Funcion para crear una tarea a la BC
 agregarTarea:-
@@ -81,11 +116,11 @@ validaAgregarTareaGes:-
  
 
 aux_validaAgrega(Proyecto,Persona,Tarea):-
-    (\+ proyecto_existe(Proyecto),nl,nl,alerta_NotFound_Proyectos,nl,nl,fail);
-    (consult('gestionPersonas.pl'),\+ nombre_registrado(Persona),nl,nl,alerta_NotFound_Personas,nl,nl,fail);
-    (consult('v_Tareas.pl'),cargar_datos, \+ usuario_tiene_tarea(Persona,Tarea),alerta_SchTarea,nl,nl,fail);
-    (\+comprueba_Tareas(Tarea),nl,nl,alerta_1,fail);
-    nl,nl,write('Se cumplen los requisitos'),nl,nl.
+    (\+ proyecto_existe(Proyecto),nl,nl,alerta_NotFound_Proyectos,nl,nl,fail,mainTareas);
+    (consult('gestionPersonas.pl'),\+ nombre_registrado(Persona),nl,nl,alerta_NotFound_Personas,nl,nl,fail,mainTareas);
+    (consult('v_Tareas.pl'),cargar_datos, \+ usuario_tiene_tarea(Persona,Tarea),alerta_SchTarea,nl,nl,fail,mainTareas);
+    (\+comprueba_Tareas(Tarea),nl,nl,alerta_1,fail,mainTareas);
+    nl,nl,write('Se cumplen los requisitos'),nl,nl,mainTareas.
 
 
 %       Funcion encargada de verificar datos  para mostrar Tareas
@@ -159,7 +194,7 @@ buscar_en_archivo(Stream, NombreABuscar) :-
 
 % verifica si un proyecto existe
 proyecto_existe(NombreBuscado) :-
-    open('../data/proyectos.txt', read, Stream), % Reemplaza 'tu_archivo.txt' con la ruta correcta a tu archivo
+    open('../data/proyectos.txt', read, Stream), %
     nombre_existe_en_archivo(NombreBuscado, Stream),
     close(Stream).
 
@@ -247,6 +282,14 @@ load:-
     write('             │          Guardando datos...       │'), nl,
     write('             ╰───────────────────────────────────╯'), nl.
 
+alerta_messageDate:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  Formato Fecha no valid            │'), nl,
+    write('             │  Nota: Debe de ser dd/mm/aaaa      │'), nl,
+    write('             │  Fecha inicio debe ser mayor       │'), nl,
+    write('             ╰────────────────────────────────────╯').
 % Validaciones para Creacion y eliminacion de archivos
 
 eliminar_archivo(NombreArchivo) :-

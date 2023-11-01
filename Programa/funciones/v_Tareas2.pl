@@ -1,24 +1,27 @@
 reemplazar_estado_por_nombre([], _, _, _, []).
-reemplazar_estado_por_nombre([H|T], NombreBuscado, Encargado, Tarea, [H2|T2]) :-
-    split_string(H, ",", "", [Nombre, Estado, Asignacion | FechaCierreResto]),
+reemplazar_estado_por_nombre([H|T], NombreBuscado, TareaBuscada, Cierre, [H2|T2]) :-
+    split_string(H, ",", "", [Nombre, Estado, Asignacion, Tarea | FechaCierreResto]),
     downcase_atom(Nombre, NombreMin),
     downcase_atom(NombreBuscado, NombreBuscadoMin),
+    downcase_atom(Tarea, TareaMin),
+    downcase_atom(TareaBuscada, TareaBuscadaMin),
     (
-        (NombreMin = NombreBuscadoMin, Estado = "pendiente") ->
+        nl,write('NombreBuscadoMin: '), write(NombreBuscadoMin), nl,write('NombreMin: '), write(NombreMin), nl,write('TareaBuscadaMin: '), write(TareaBuscadaMin), nl,write('TareaMin: '), write(TareaMin), nl,
+        (NombreMin = NombreBuscadoMin, TareaMin = TareaBuscadaMin) ->
         (
-            atomic_list_concat([Nombre, 'activo', Encargado, Tarea | FechaCierreResto], ",", H2)
+            atomic_list_concat([Nombre, 'cerrado', Asignacion, Tarea, Cierre | FechaCierreResto], ",", H2)
         );
         (
-            atomic_list_concat([Nombre, Estado, Asignacion | FechaCierreResto], ",", H2)
+            atomic_list_concat([Nombre, Estado, Asignacion, Tarea | FechaCierreResto], ",", H2)
         )
     ),
-    reemplazar_estado_por_nombre(T, NombreBuscado, Encargado, Tarea, T2).
+    reemplazar_estado_por_nombre(T, NombreBuscado, TareaBuscada, Cierre, T2).
 
 % Ejemplo de uso
-proyectos_modificados_con_nombre_encargado_y_tarea(NombreBuscado, Encargado, Tarea) :-
+proyectos_modifi(NombreBuscado, TareaBuscada, Cierre) :- %proyectos_modifi('proyecto 4', 'qa','12/02/2020').  
     read_file('../data/tareas.txt', Lineas),
-    reemplazar_estado_por_nombre(Lineas, NombreBuscado, Encargado, Tarea, LineasModificadas),
-    write_file('../data/salida.txt', LineasModificadas),
+    reemplazar_estado_por_nombre(Lineas, NombreBuscado, TareaBuscada, Cierre, LineasModificadas),
+    write_file('salidos.txt', LineasModificadas).
     eliminar_archivo('../data/tareas.txt'),
     cambiar_nombre_archivo('../data/salida.txt', '../data/tareas.txt').
 

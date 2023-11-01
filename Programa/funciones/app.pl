@@ -24,11 +24,8 @@ vista_administrativo :-
     write('│ 1. Gestión de Personas           │'), nl,
     write('│ 2. Gestión de Proyectos          │'), nl,
     write('│ 3. Gestión de Tareas             │'), nl,
-    write('│ 4. Buscar Tareas Libres          │'), nl,
-    write('│ 5. Recomendar Persona            │'), nl,
-    write('│ 6. Asignar a Tarea               │'), nl,
-    write('│ 7. Cerrar Tarea                  │'), nl,
-    write('│ 8. Estadísticas                  │'), nl,
+    write('│ 4. Recomendar Persona            │'), nl,
+    write('│ 5. Estadísticas                  │'), nl,
     write('│ 0. Salir                         │'), nl,
     write('╰──────────────────────────────────╯'), nl,
     write('Ingrese una de las Opciones mostradas: ').
@@ -92,13 +89,11 @@ menu_administrativo:-
     (
         atom_number(OpcionAtom, Opcion), Opcion == 0, nl,nl,write('Gracias por usar el programa'); 
         atom_number(OpcionAtom, Opcion), Opcion == 1, consult('gestionPersonas.pl'),controladorPrincipal_Personas;
-        atom_number(OpcionAtom, Opcion), Opcion == 2, write('Develop');
+        atom_number(OpcionAtom, Opcion), Opcion == 2, consult('gestionProyectos.pl'),main_Proyectos;
         atom_number(OpcionAtom, Opcion), Opcion == 3, consult('gestionTareas.pl'),mainTareas;
         atom_number(OpcionAtom, Opcion), Opcion == 4, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 5, write('Develop');
-        atom_number(OpcionAtom, Opcion), Opcion == 6, write('Develop');
-        atom_number(OpcionAtom, Opcion), Opcion == 7, write('Develop');
-        atom_number(OpcionAtom, Opcion), Opcion == 8, write('Develop'); 
         alerta_option, nl, main_administrativo
     ).
+
 

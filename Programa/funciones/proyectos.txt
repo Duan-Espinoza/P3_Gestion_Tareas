@@ -1,6 +1,0 @@
-proyecto2,pendiente,sin asignar,sin fecha cierre
-proyecto3,pendiente,sin asignar,sin fecha cierre
-proyecto4,activo,hansol,qa,sin fecha cierre
-proyecto6,activo,anie,QA,sin fecha cierre
-proyecto7,pendiente,sin asignar,sin fecha cierre
-proyecto4,pendiente,sin asignar,sin fecha de cierre

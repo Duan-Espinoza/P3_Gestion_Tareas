@@ -1,10 +1,10 @@
-aaron,programador,10,backend:13,disenio:15,qa:14
-hansol,programador,10,backend:13,disenio:15,qa:14
-duan,programador,5,backend:13,disenio:15,qa:14
-esteban,programador,2,backend:13,disenio:15,qa:14
-anie,programador,10,backend:13,disenio:15,qa:14
+aaron,programador,10,backend:13,disenio:151,qa:142
+hansol,programador,10,backend:13,disenio:15,qa:142
+duan,programador,5,backend:132,disenio:15,qa:14
+esteban,programador,2,backend:13,disenio:15,qa:123
+anie,programador,10,backend:13,disenio:152,qa:14
 jesie,programador,12,backend:13,disenio:15,qa:14
 jesenia,programador,12,backend:13,disenio:15,qa:14
 alexandra,programador,10,backend:13,disenio:15,qa:14
 juan,programador,5,backend:13,disenio:15,qa:14
-marlon,programador,5,backend:13,disenio:15,qa:14,fullstack:16,requerimientos:14
+marlon,programador,5,backend:13,disenio:15,qa:14,fullstack:16,requerimientos:141jonatans,programador,10,qa:13,backend:12

@@ -72,7 +72,7 @@ main_Proyectos:-
     (
         Opcion = "1", pideData;
         Opcion = "2", mostrar_datos;
-        Opcion = "0", write('develop')
+        Opcion = "0", consult('app.pl'), menu_administrativo
     ).
 
 
@@ -152,18 +152,18 @@ validaVacio(Dato) :-
 
 % Verifica que la fecha sea válida %% dd/mm/aaaa
 fecha_valida(Fecha) :-
-atomic(Fecha), % Verifica que el argumento sea un átomo (string)
-atom_length(Fecha, 10), % La fecha debe tener exactamente 10 caracteres
-% Extrae el día, mes y año como subcadenas
-sub_atom(Fecha, 0, 2, _, Dia),
-sub_atom(Fecha, 3, 2, _, Mes),
-sub_atom(Fecha, 6, 4, _, Anio),
-atom_number(Dia, DiaNum), % Convierte el día a número
-atom_number(Mes, MesNum), % Convierte el mes a número
-atom_number(Anio, AnioNum), % Convierte el año a número
-between(1, 31, DiaNum), % Verifica el rango del día
-between(1, 12, MesNum), % Verifica el rango del mes
-between(1000, 9999, AnioNum). % Verifica el rango del año
+    atomic(Fecha), % Verifica que el argumento sea un átomo (string)
+    atom_length(Fecha, 10), % La fecha debe tener exactamente 10 caracteres
+    % Extrae el día, mes y año como subcadenas
+    sub_atom(Fecha, 0, 2, _, Dia),
+    sub_atom(Fecha, 3, 2, _, Mes),
+    sub_atom(Fecha, 6, 4, _, Anio),
+    atom_number(Dia, DiaNum), % Convierte el día a número
+    atom_number(Mes, MesNum), % Convierte el mes a número
+    atom_number(Anio, AnioNum), % Convierte el año a número
+    between(1, 31, DiaNum), % Verifica el rango del día
+    between(1, 12, MesNum), % Verifica el rango del mes
+    between(1000, 9999, AnioNum). % Verifica el rango del año
 
 
 % Predicado para verificar si la fecha de fin no es menor que la fecha de inicio
@@ -187,7 +187,7 @@ reformatear_fecha(Fecha, Reformateada) :-
 
 % verifica si un proyecto existe
 proyecto_existe(NombreBuscado) :-
-    open('../data/proyectos.txt', read, Stream), % Reemplaza 'tu_archivo.txt' con la ruta correcta a tu archivo
+    open('../data/proyectos.txt', read, Stream), % Reemplaza 
     nombre_existe_en_archivo(NombreBuscado, Stream),
     close(Stream).
 
