@@ -8,40 +8,34 @@ mostrar_proyectos(NombreArchivo) :-
 read_proyectos(Stream) :-
     read_line_to_string(Stream, Line),
     ( Line \= end_of_file ->
-        split_string(Line, ",", ",", Items),
-        parse_proyecto(Items, NombreTarea, Estado, Encargado, Tarea, FechaCierre),
-        (Encargado \= "sin asignar" -> mostrar_info_proyecto_asignado(NombreTarea, Estado, Encargado, Tarea, FechaCierre) ; mostrar_info_proyecto_sin_asignar(NombreTarea, Estado, FechaCierre)),
+        parse_proyecto(Line, Proyecto),
+        mostrar_info_proyecto(Proyecto),
         read_proyectos(Stream)
     ; true
     ).
 
 % Predicado para analizar una línea y extraer los datos del proyecto
-parse_proyecto(Items, NombreTarea, Estado, Encargado, Tarea, FechaCierre) :-
-    [NombreTarea, Estado, Encargado | Rest] = Items,
-    (Rest = ["sin fecha cierre"] ->
-        Tarea = "sin tarea",
-        FechaCierre = "sin fecha cierre"
-    ;
-    Rest = [Tarea, "sin fecha cierre"],
-    FechaCierre = "sin fecha cierre").
+parse_proyecto(Line, Proyecto) :-
+    split_string(Line, ",", ",", Items),
+    length(Items, NumItems),
+    (NumItems >= 3 ->
+        [NombreTarea, Estado, Encargado | Rest] = Items,
+        (length(Rest, RestLength), RestLength > 0 ->
+            Rest = [Tarea | FechaCierreList],
+            atomic_list_concat(FechaCierreList, ",", FechaCierre)
+        ; Tarea = "sin tarea", FechaCierre = "sin fecha cierre"),
+        Proyecto = proyecto(NombreTarea, Estado, Encargado, Tarea, FechaCierre)
+    ; Proyecto = invalid).
 
-% Función para mostrar la información de una tarea cuando el encargado está asignado
-mostrar_info_proyecto_asignado(NombreTarea, Estado, Encargado, Tarea, FechaCierre) :-
-    write('╭────────────────────────────────────────────────╮'), nl,
-    format('         Proyecto: ~w~n', [NombreTarea]),
-    write('╰────────────────────────────────────────────────╯'), nl,
-    format('  • Estado: ~w~n', [Estado]),
-    format('  • Encargado: ~w~n', [Encargado]),
-    format('  • Tarea: ~w~n', [Tarea]),
-    format('  • Fecha de Cierre: ~w~n~n', [FechaCierre]).
-
-% Función para mostrar la información de una tarea cuando el encargado es "sin asignar"
-mostrar_info_proyecto_sin_asignar(NombreTarea, Estado, FechaCierre) :-
-    write('╭────────────────────────────────────────────────╮'), nl,
-    format('         Proyecto: ~w~n', [NombreTarea]),
-    write('╰────────────────────────────────────────────────╯'), nl,
-    format('  • Estado: ~w~n', [Estado]),
-    format('  • Encargado: sin asignar~n'),
-    format('  • Fecha de Cierre: ~w~n~n', [FechaCierre]).
-
+% Función para mostrar la información de un proyecto
+mostrar_info_proyecto(Proyecto) :-
+    (Proyecto = proyecto(NombreTarea, Estado, Encargado, Tarea, FechaCierre) ->
+        write('╭────────────────────────────────────────────────╮'), nl,
+        format('         Proyecto: ~w~n', [NombreTarea]),
+        write('╰────────────────────────────────────────────────╯'), nl,
+        format('  • Estado: ~w~n', [Estado]),
+        format('  • Encargado: ~w~n', [Encargado]),
+        format('  • Tarea: ~w~n', [Tarea]),
+        format('  • Fecha de Cierre: ~w~n~n', [FechaCierre])
+    ; true).
 

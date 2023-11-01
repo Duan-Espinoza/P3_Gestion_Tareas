@@ -90,6 +90,7 @@ menu_administrativo:-
     read_line(OpcionCodes),
     atom_codes(OpcionAtom, OpcionCodes),
     (
+        atom_number(OpcionAtom, Opcion), Opcion == 0, nl,nl,write('Gracias por usar el programa'); 
         atom_number(OpcionAtom, Opcion), Opcion == 1, consult('gestionPersonas.pl'),controladorPrincipal_Personas;
         atom_number(OpcionAtom, Opcion), Opcion == 2, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 3, consult('gestionTareas.pl'),mainTareas;

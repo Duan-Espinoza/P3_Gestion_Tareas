@@ -1,9 +1,9 @@
-aaron,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
-hansol,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
-duan,programador,5,[[backend, 13], [frontend, 13], [qa, 45]]
-esteban,programador,2,[[backend, 13], [frontend, 13], [qa, 45]]
-estafani,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
-jesie,programador,12,12,[[backend, 13], [frontend, 13], [qa, 45]]
-jesenia,programador,12,[[backend, 13], [frontend, 13], [qa, 45]]
-alexandra,programador,10,[[backend, 13], [frontend, 13], [qa, 45]]
-juan,programador,5,[[backend,13],[disenio,15],[qa,14]]
+aaron,programador,10,backend:13,disenio:15,qa:14
+hansol,programador,10,backend:13,disenio:15,qa:14
+duan,programador,5,backend:13,disenio:15,qa:14
+esteban,programador,2,backend:13,disenio:15,qa:14
+estafani,programador,10,backend:13,disenio:15,qa:14
+jesie,programador,12,backend:13,disenio:15,qa:14
+jesenia,programador,12,backend:13,disenio:15,qa:14
+alexandra,programador,10,backend:13,disenio:15,qa:14
+juan,programador,5,backend:13,disenio:15,qa:14

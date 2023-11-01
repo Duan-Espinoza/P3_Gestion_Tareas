@@ -6,7 +6,7 @@ reemplazar_estado_por_nombre([H|T], NombreBuscado, Encargado, Tarea, [H2|T2]) :-
     (
         (NombreMin = NombreBuscadoMin, Estado = "pendiente") ->
         (
-            atomic_list_concat([Nombre, Estado, Encargado, Tarea | FechaCierreResto], ",", H2)
+            atomic_list_concat([Nombre, 'activo', Encargado, Tarea | FechaCierreResto], ",", H2)
         );
         (
             atomic_list_concat([Nombre, Estado, Asignacion | FechaCierreResto], ",", H2)
@@ -16,9 +16,13 @@ reemplazar_estado_por_nombre([H|T], NombreBuscado, Encargado, Tarea, [H2|T2]) :-
 
 % Ejemplo de uso
 proyectos_modificados_con_nombre_encargado_y_tarea(NombreBuscado, Encargado, Tarea) :-
+    write('dentro de '),
+    write(NombreBuscado), nl, write(Encargado), nl, write(Tarea), nl, nl,
     read_file('../data/tareas.txt', Lineas),
     reemplazar_estado_por_nombre(Lineas, NombreBuscado, Encargado, Tarea, LineasModificadas),
-    write_file('salida.txt', LineasModificadas).
+    write_file('../data/salida.txt', LineasModificadas),
+    eliminar_archivo('../data/tareas.txt'),
+    cambiar_nombre_archivo('../data/salida.txt', '../data/tareas.txt').
 
 % Predicados para leer y escribir archivos (sin cambios)
 read_file(File, Lines) :-
@@ -45,3 +49,16 @@ write_lines(Stream, [Line|Lines]) :-
 
 
 
+% Validaciones para Creacion y eliminacion de archivos
+
+eliminar_archivo(NombreArchivo) :-
+    atomic_list_concat(['rm', NombreArchivo], ' ', Comando),
+    shell(Comando, _).
+
+crear_archivo(NombreArchivo, Contenido) :-
+    open(NombreArchivo, write, Stream),
+    write(Stream, Contenido),
+    close(Stream).
+
+cambiar_nombre_archivo(AntiguoNombre, NuevoNombre) :-
+    rename_file(AntiguoNombre, NuevoNombre).

@@ -185,7 +185,7 @@ reformatear_fecha(Fecha, Reformateada) :-
 
 
 
-
+% verifica si un proyecto existe
 proyecto_existe(NombreBuscado) :-
     open('../data/proyectos.txt', read, Stream), % Reemplaza 'tu_archivo.txt' con la ruta correcta a tu archivo
     nombre_existe_en_archivo(NombreBuscado, Stream),
