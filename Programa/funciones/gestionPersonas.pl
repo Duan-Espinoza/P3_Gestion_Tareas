@@ -45,15 +45,17 @@ datosPersona:-
                     (validaVacio(RatingData),nl,alerta_5,nl,datosPersona);
                     (
                     atom_number(RatingAtom, Rating), % Convierte a numero el string y Verifica que el rating sea un numero
-                    obtener_tareas([], TareasFinales) ->
+                    obtener_tareas('', TareasFinales) ->
                         (
+                            % obtengo tareas finales de forma correcta sin , 
+                            quitar_primera_coma(TareasFinales, TareasSinPrimeraComa),
                             % Registra La Persona
                             nl,nl,
                             write('╭────────────────────────────────────────────╮'), nl,
-                            format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, TareasFinales]),nl,
+                            format('----       Los datos ingresados son      ----~n╰────────────────────────────────────────────╯~n  ✔ Nombre: ~w~n  ✔ Puesto: ~w~n  ✔ Costo : ₡ ~w~n  ✔ Rating: ~w~n  ✔ Tareas: ~w~n    ', [Nombre, Puesto, Costo, Rating, TareasSinPrimeraComa]),nl,
                             nl,load,
-                            registraPersona(NombreMinuscula,PuestoMinuscula,Rating,TareasFinales), controladorPrincipal_Personas;
-                            alerta_3,nl,write(''),nl,datosPersona, nl, controladorPrincipal_Personas
+                            registraPersona(NombreMinuscula,PuestoMinuscula,Rating,TareasSinPrimeraComa),nl,nl,controladorPrincipal_Personas;
+                            alerta_3,nl,nl,datosPersona
                         ) 
                     % Valida que rating sea numero                   
                     ;nl,nl,write('ERROR: Valor de Rating debe ser un numero'),nl,nl,datosPersona
@@ -64,8 +66,6 @@ datosPersona:-
             
         )
     ).
-
-
 
 % Guarda los datos de la persona en un archivo
 % Entradas: Nombre, Puesto, Costo, Reating, Tareas
@@ -93,6 +93,9 @@ registraPersona(Nombre,Puesto,Reating,Tareas) :-   %Ejemplo: registraPersona('pe
 % Entradas: [], Tareas %% Una lista vacía y la lista de tareas que servirá como resultado
 % Salidas: Lista de tareas
 % Restricciones: Las tareas deben ser válidas y no deben estar vacías
+% Inicialmente, TareasActuales es una cadena vacía.
+% Inicialmente, TareasActuales es una cadena vacía.
+% Inicialmente, TareasActuales es una cadena vacía.
 obtener_tareas(TareasActuales, TareasFinales) :-
     write('►Ingrese una tarea (o "fin" para finalizar): '),
     read_line(TareasCodes),
@@ -105,28 +108,35 @@ obtener_tareas(TareasActuales, TareasFinales) :-
         (TareasMinuscula = 'fin' ->
             TareasFinales = TareasActuales
             ; 
-            %Se valida que pertenezca a las posibles opciones de tareas
+            % Se valida que pertenezca a las posibles opciones de tareas
             comprueba_Tareas(TareasMinuscula) ->
             (
-                consult('gestionTareas.pl'),buscar_nombreTarea(TareasMinuscula) ->
-                    write('►Ingrese el costo de la tarea: '),
-                    read_line(CostoCodes),
-                    atom_codes(CostoAtom, CostoCodes),
-                    atom_string(CostoAtom, CostoString),
-                    downcase_atom(CostoString, CostoMinuscula),
-                    atom_number(CostoMinuscula, CostoNumero),
-                    downcase_atom(TareasMinuscula, TareaMinuscula), % Convierte la tarea a minúsculas
-                    append(TareasActuales, [[TareaMinuscula, CostoNumero]], NuevasTareas), % Agrega el par [Tarea, Costo]
-                    obtener_tareas(NuevasTareas, TareasFinales)
-                    ;nl,alerta_7,nl,obtener_tareas(TareasActuales, TareasFinales)
-            );nl,alerta_1,nl, write('NOTA: Se reiniciará el conteo de tareas'),nl,nl,obtener_tareas(TareasActuales, TareasFinales)
+                consult('gestionTareas.pl'),
+                write('►Ingrese el costo de la tarea: '),
+                read_line(CostoCodes),
+                atom_codes(CostoAtom, CostoCodes),
+                atom_string(CostoAtom, CostoString),
+                downcase_atom(CostoString, CostoMinuscula),
+                atom_number(CostoMinuscula, CostoNumero),
+                downcase_atom(TareasMinuscula, TareaMinuscula), % Convierte la tarea a minúsculas
+                format(atom(NuevoPar), ',~w:~w', [TareaMinuscula, CostoNumero]), % Agrega el par "tarea:costo" con coma
+                % Agrega el par "tarea:costo" a TareasActuales
+                (TareasActuales = "" -> TareasActualesConNuevoPar = NuevoPar; atom_concat(TareasActuales, NuevoPar, TareasActualesConNuevoPar)),
+                obtener_tareas(TareasActualesConNuevoPar, TareasFinales)
+                ;nl,alerta_7,nl,obtener_tareas(TareasActuales, TareasFinales)
+            );nl,alerta_1,nl, write('NOTA: Se reiniciará el conteo de tareas'),nl,nl,obtener_tareas("", TareasFinales)
         )
-    ); nl, alerta_5, nl, write('NOTA: Se reiniciará el conteo de tareas'), nl, nl, obtener_tareas([], TareasFinales).
-
-
+    ); nl, alerta_5, nl, write('NOTA: Se reiniciará el conteo de tareas'), nl, nl, obtener_tareas("", TareasFinales).
 
 
 % Validaciones
+
+% Predicado para quitar la primera coma de una cadena
+quitar_primera_coma(Cadena, Resultado) :-
+    (Cadena = ',' ; sub_atom(Cadena, 0, 1, _, ',')), % Verifica si la cadena comienza con una coma
+    sub_atom(Cadena, 1, _, 0, Resultado). % Quita la primera coma y obtiene el resultado
+
+quitar_primera_coma(Cadena, Cadena). % Si la cadena no comienza con una coma, se deja sin cambios.
 
 
 % Predicado para validar que la tarea no sea vacía
@@ -145,7 +155,28 @@ comprueba_Tareas(Palabra) :-
 % Restricciones: El valor debe de ser un numero
 es_numero(Valor) :- number(Valor).
 
+% Predicado para buscar un nombre en el archivo
+buscar_nombreTarea(NombreABuscar) :-
+    open('../data/tareas.txt', read, Stream),
+    buscar_en_archivo(Stream, NombreABuscar),
+    close(Stream).
 
+% Predicado para buscar en el archivo
+buscar_en_archivo(Stream, NombreABuscar) :-
+    read_line(Stream, Line),
+    (Line \== end_of_file ->
+        atomic_list_concat([NombreTarea, _, _, _], ',', Line), %atomic concatena los elementos de la lista con el separador
+
+        (NombreTarea = NombreABuscar ->
+            true
+        ; buscar_en_archivo(Stream, NombreABuscar)
+        )
+    ; false
+    ).
+
+% Predicado para leer una línea del archivo
+read_line(Stream, Line) :-
+    read_line_to_string(Stream, Line).
 
 muestraPersonas:-
     nl,nl,mssg_mostrar,
@@ -153,8 +184,11 @@ muestraPersonas:-
         archivo_existe('../data/personas.txt') ->
         (
             open('../data/personas.txt', read, Stream),
-            read_lines(Stream),
-            close(Stream),nl,nl,controladorPrincipal_Personas
+            \+ read_lines(Stream),
+            close(Stream),nl,
+            nl,
+            (consult('v_Personas.pl'),runV),nl
+            ,controladorPrincipal_Personas
         );alerta_4,controladorPrincipal_Personas
     ).
 
@@ -167,7 +201,7 @@ read_lines(Stream) :-
     write('╰────────────────────────────────────────────────╯'), nl,
     format('  • Puesto:             ~w~n', [Puesto]),
     format('  • Rating:             ★ ~w~n', [Rating]),
-    format('  • Tareas y Costo:     ~w~n', [Tareas]), nl,
+    format('  • Tareas y Costo:     ~w~n', [Tareas]),
     read_lines(Stream).
 
 
@@ -210,9 +244,6 @@ leer_linea(Stream, NombreABuscar) :-
         )
     ).
 
-
-
-
 %                   Seccion de Vistas 
 
 vistaPrincipal_Personas:-
@@ -237,6 +268,12 @@ mssg_mostrar:-
     write('╭─────────────────────────────────────────────────────────────────────────────────╮'), nl,
     write('│  MENSAJE: A continuación se mostrará la información de la base de conocimiento  │'), nl,
     write('│           registrada con respecto a las personas.                               │'), nl,
+    write('╰─────────────────────────────────────────────────────────────────────────────────╯'), nl.
+    
+mssg_mostrarTareas:-
+    write('╭─────────────────────────────────────────────────────────────────────────────────╮'), nl,
+    write('│  MENSAJE: A continuación se mostrará la información de la base de conocimiento  │'), nl,
+    write('│  que tienen relacion con el usuario y sus tareas                                │'), nl,
     write('╰─────────────────────────────────────────────────────────────────────────────────╯'), nl.
     
 
