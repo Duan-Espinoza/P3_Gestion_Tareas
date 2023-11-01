@@ -20,7 +20,7 @@ mainTareas :-
     read_line(OpcionCodes),
     atom_codes(OpcionAtom, OpcionCodes),
     (
-        atom_number(OpcionAtom, Opcion), Opcion == 1, mostrar_datosTareas;
+        atom_number(OpcionAtom, Opcion), Opcion == 1,validaShow ;
         atom_number(OpcionAtom, Opcion), Opcion == 2, agregarTarea;
         atom_number(OpcionAtom, Opcion), Opcion == 3, write('Develop');
         atom_number(OpcionAtom, Opcion), Opcion == 4, write('Develop');
@@ -28,7 +28,53 @@ mainTareas :-
         atom_number(OpcionAtom, Opcion), Opcion == 5, consult('app.pl'), menu_administrativo;
         nl, write('Error: debe de ingresar una de las opciones mostradas'), nl, mainTareas
     ).
-    
+% Funcion para asignar tarea a persona en un proyecto
+
+validaAgregarTarea:-
+    archivo_existe('../data/proyectos.txt') ->  
+    (
+      archivo_existe('../data/tareas.txt')->
+      (
+        %Agrega Tarea
+        %Se valida: Vacios Falta: existencias
+        write('\nIngrese el nombre del proyecto: '),
+        read_line(ProyectoCodes),
+        atom_codes(ProyectoAtom, ProyectoCodes),
+        atom_string(ProyectoAtom, Proyecto),
+        downcase_atom(Proyecto, ProyectoMinuscula),
+
+        validaVacio(ProyectoMinuscula),nl,nl,alerta_invalidInput,nl; 
+
+        write('\nIngrese el nombre de la Persona: '),
+        read_line(PersonaCodes),
+        atom_codes(PersonaAtom, PersonaCodes),
+        atom_string(PersonaAtom, Persona),
+        downcase_atom(Persona, PersonaMinuscula),
+
+        validaVacio(Persona),nl,nl,alerta_invalidInput,nl; 
+
+
+        write('\nIngrese el nombre de la Tarea: '),
+        read_line(TareaCodes),
+        atom_codes(TareaAtom, TareaCodes),
+        atom_string(TareaAtom, Tarea),
+        downcase_atom(Tarea, TareaMinuscula),
+
+        validaVacio(Tarea),nl,nl,alerta_invalidInput,nl; 
+
+        write('Funciona')
+
+      );nl,nl,alerta_NotFound_Tareas,nl,nl
+    );nl,nl,alerta_NotFound_Proyectos,nl,nl.
+
+
+%       Funcion encargada de verificar datos  para mostrar Tareas
+
+validaShow:-
+    archivo_existe('../data/tareas.txt') ->  
+    (
+        nl,nl,mssg_mostrar_tareas,nl,consult('muestraTareas.pl'),mostrar_proyectos
+    );nl,nl,alerta_NotFound_Tareas,nl,nl,mainTareas.
 
 % Función para agregar una nueva tarea en la base de conocimientos
 agregarTarea :-
@@ -55,15 +101,15 @@ registrarTarea(NombreProyecto) :-
 
 
 
-% FALTA
-% VALIDAR EXISTENCIA DE TAREAS, NO SE PUEDEN REGISTRAR TAREAS QUE YA ESTAN REGISTRADAS EN EL TXT 
+%           Seccion de validacione
 
-%           Seccion de validaciones
+% Predicado para validar que la tarea no sea vacía
+validaVacio(Dato) :-
+    string_length(Dato, 0).
 
 %   Verificiar si el proyecto existe
 buscaProyecto(NombreProyecto) :-
     %Primero valido el dato entrante 
-    (buscar_nombreTarea(NombreProyecto),nl,nl,alerta_Sch,nl,agregarTarea);
     (archivo_existe('../data/tareas.txt') ->
         archivo_existe('../data/proyectos.txt') ->
         (
@@ -74,31 +120,13 @@ buscaProyecto(NombreProyecto) :-
 
             ); write('No existe el proyecto'),nl,nl,agregarTarea
         );nl,nl,alerta_NotFound_Proyectos
-    ),nl,nl,alerta_NotFound_Tareas,nl,agregarTarea.
+    ),nl,nl,alerta_NotFound_Tareas,nl.
 
 
 % Verifica si el archivo existe
 archivo_existe(NombreArchivo) :- 
     exists_file(NombreArchivo).
 
-
-mostrar_datosTareas:-
-    nl,nl,mssg_mostrar_tareas,
-    (
-        archivo_existe('../data/tareas.txt') ->
-        open('../data/tareas.txt', read, Stream),
-        mostrar_datos_desde_archivo(Stream),
-        close(Stream), mainTareas
-        ; alerta_NotFound_Tareas, nl,nl,mainTareas
-    ).
-
-mostrar_datos_desde_archivo(Stream) :-
-    read_line(Stream, Line),
-    (Line \== end_of_file ->
-        mostrarTareas(Line),
-        mostrar_datos_desde_archivo(Stream)
-    ; true
-    ).
 
 % Predicado para leer una línea del archivo
 read_line(Stream, Line) :-
@@ -124,20 +152,6 @@ buscar_en_archivo(Stream, NombreABuscar) :-
     ; false
     ).
 
-%           Seccion de Vistas
-
-% Predicado para formatear y mostrar la línea
-mostrarTareas(Line) :-
-    atomic_list_concat([NombreTarea, Estado, Encargado, FechaCierre], ',', Line),
-    write('╭────────────────────────────────────────────────╮'), nl,
-    format('         Información de la Tarea: ~w~n', [NombreTarea]),
-    write('╰────────────────────────────────────────────────╯'), nl,
-    format('  • Estado: ~w~n', [Estado]),
-    format('  • Encargado: ~w~n', [Encargado]),
-    format('  • Fecha de Cierre: ~w~n~n', [FechaCierre]).
-
-
-
 mssg_mostrar_tareas:-
     write('╭─────────────────────────────────────────────────────────────────────────────────╮'), nl,
     write('│  MENSAJE: A continuación se mostrará la información de la base de conocimiento  │'), nl,
@@ -161,7 +175,12 @@ alerta_NotFound_Proyectos:-
     write('             ╰────────────────────────────────────╯').
 
 
-
+alerta_invalidInput:-
+    nl,nl,
+    write('             ╭────────────────────────────────────╮'), nl,
+    write('             │           ⚠ ALERTA ⚠               │'), nl,
+    write('             │  No se permiten datos vaciós       │'), nl,
+    write('             ╰────────────────────────────────────╯').
 
 alerta_Sch:-
     nl,nl,
@@ -172,59 +191,3 @@ alerta_Sch:-
 
 
 
-
-%           Seccion de BC
-
-% Cargar datos desde un archivo
-cargar_desde_archivo(NombreArchivo) :-
-    open(NombreArchivo, read, Stream),
-    repeat,
-    read_line_to_codes(Stream, Linea),
-    (
-        Linea \= end_of_file,
-        procesar_linea(Linea),
-        fail
-    ;
-        close(Stream)
-    ).
-
-procesar_linea(Linea) :-
-    atom_codes(AtomLinea, Linea),
-    atomic_list_concat(Campos, ',', AtomLinea),
-    % Asumiendo que el primer campo contiene el nombre del proyecto en el formato "proyecto 1"
-    nth1(1, Campos, NombreProyectoAtom),
-    atomic_list_concat(NombreProyectoLista, ' ', NombreProyectoAtom),
-    atomic_list_concat(NombreProyectoLista, NombreProyecto), % Eliminará el espacio en blanco
-    assert(proyecto(NombreProyecto, Pendiente, sin_asignar, sin_fecha_cierre)).
-
-% Regla para verificar y modificar el encargado
-verificar_y_modificar_encargado(Nombre, NuevoEncargado) :-
-    proyecto(Nombre, Estado, _, FechaCierre), % Obtenemos el Estado y FechaCierre del proyecto
-    retract(proyecto(Nombre, Estado, _, FechaCierre)), % Retiramos el hecho existente
-    assertz(proyecto(Nombre, Estado, NuevoEncargado, FechaCierre)). % Agregamos el nuevo hecho
-
-% Consulta de ejemplo para cambiar el encargado del proyecto1 a "juan"
-cambiar_encargado_si_existe(proyecto1) :-
-    verificar_y_modificar_encargado(proyecto1, juan).
-
-
-
-% ---------------------  Seccion de pruebas  ---------------------
-
-
-
-% Función para guardar la base de conocimiento en un archivo de texto
-% Función para guardar la base de conocimiento en un archivo de texto
-guardar_en_archivo(NombreArchivo) :-
-    open(NombreArchivo, write, Stream),
-    forall(
-        proyecto(NombreProyecto, Estado, Encargado, FechaCierre),
-        (
-            atomic_list_concat([NombreProyecto, Estado, Encargado, FechaCierre], ',', Linea),
-            write(Stream, Linea),
-            write(Stream, '\n')
-        )
-    ),
-    close(Stream).
-
-% Uso: guardar_en_archivo('../data/tareas.txt').
